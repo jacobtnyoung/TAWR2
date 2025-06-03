@@ -129,16 +129,28 @@ cat( austen_word_v[ ( which( austen_word_v == "dog" ) - 5) : ( which( austen_wor
 
 
 # ----
-# Chapter 9
+# Chapter 10
+
+rm( list = ls() )
+
+# call the functions you created in a separate script
+source( "code/corpus_functions.R")
+
+# set input directory
+input_dir <- "data/text"
+
+# set output directory
+output_dir <- "results"
+
+# using the readline function
+myyear <- readline( "What year was Moby Dick published? \n" ) 
+
+# try the function
+doitKwic( input_dir )
 
 
-
-
-
-
-
-
-
+# ----
+# Chapter 11
 
 
 
