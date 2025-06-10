@@ -152,8 +152,37 @@ doitKwic( input_dir )
 # ----
 # Chapter 11
 
+# using stack function
+chapter_lengths_df <- stack( lapply( chapter_raws_l, sum ) )
 
+# number of words that occur once 
+chap_haps_df_l <- lapply( chapter_raws_l, function( x ) sum( x == 1 ) )
+chap_haps_df <- stack( chap_haps_df_l )
 
+# build a data frame
+a_data_frame <- data.frame( chapter_lengths_df, chap_haps_df )
+
+# build a better data frame
+hap_lens_df <- data.frame(
+  chap_names = chapter_lengths_df$ind,
+  chapter_lengths = chapter_lengths_df$values,
+  num_hapax = chap_haps_df$values
+)
+
+# start using dplyr
+library( dplyr )
+
+# mutate a variable
+new_df <- mutate(
+  hap_lens_df,
+  hapax_percentage = num_hapax / chapter_lengths
+)
+
+# clean up the headings
+nice_df <- mutate(
+  new_df,
+  short_title = gsub( "\\..*$", "", chap_names )
+)
 
 
 
