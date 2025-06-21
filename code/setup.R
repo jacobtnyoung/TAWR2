@@ -185,17 +185,31 @@ nice_df <- mutate(
 )
 
 
+# ----
+# Chapter 12
+
+# xml2 package
+library( xml2 )
 
 
+# use the read_xml function
+xml_doc <- read_xml( "data/XML1/melville1.xml" )
 
 
+# example using the xml markup
+chapters_ns <- xml_find_all( 
+  xml_doc, xpath = "//tei:div1[@type='chapter']",
+  ns = c( tei = "http://www.tei-c.org/ns/1.0" )
+  )
+
+titles_ns <- xml_find_all( 
+  xml_doc, xpath = "//tei:div1[@type='chapter']/tei:head",
+  ns = c( tei = "http://www.tei-c.org/ns/1.0" )
+)
 
 
-
-
-
-
-
+# get the titles of each chapter as a vector
+titles_v <- xml_text( titles_ns )
 
 
 
