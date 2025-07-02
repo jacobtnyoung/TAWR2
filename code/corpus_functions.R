@@ -39,3 +39,13 @@ doitKwic <- function( directory_path ){
     cat( before, "[", keyword, "]", after, "\n" )
   }
 }
+
+
+# tokenize function
+tokenize <- function( text_v, pattern = "[^A-Za-z0-9']", lower = TRUE ){
+  if( lower ){
+    text_v <- tolower( text_v )
+  }
+  word_v <- unlist( strsplit( text_v, pattern))
+  word_v[which( word_v != "" )]
+}

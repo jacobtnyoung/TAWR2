@@ -212,27 +212,104 @@ titles_ns <- xml_find_all(
 titles_v <- xml_text( titles_ns )
 
 
+# function to build a list
+get_node_text <- function( node, xpath, ns){
+  paragraph_nodes <- xml_find_all( node, xpath, ns )
+  paragraph_v <- xml_text( paragraph_nodes )
+  paste( paragraph_v, collapse = " " )
+}
+
+text_l <- lapply(
+  chapters_ns,
+  get_node_text,
+  xpath = ".//tei:p",
+  ns = c( tei =  "http://www.tei-c.org/ns/1.0" )
+)
 
 
+# test tokenize function
+source( "code/corpus_functions.R" )
+tokenize( "This is a test." )
+
+# apply the function
+word_tokens_l <- lapply( text_l, tokenize )
+
+# table of words
+word_tables_l <- lapply( word_tokens_l, table )
+
+# raw count of whale in each chapter
+unlist( lapply( word_tables_l, '[', 'whale' ) )
 
 
+# ----
+# Chapter 13
+
+rm( list = ls() )
+setwd( "/Users/jyoung20/GitHub/TAWR2" )
+
+library( xml2 )
+library( dplyr )
+
+xml_doc <- read_xml( "data/drama/hamlet.xml"  )
+
+# speakers
+speakers_ns <- xml_find_all( xml_doc, ".//SPEAKER" )
+speaker_names_v <- xml_text( speakers_ns )
+sort( table( speaker_names_v ), decreasing = TRUE )
+sort( 
+  table( speaker_names_v ) / length( speakers_ns ) , 
+  decreasing = TRUE 
+  )
+
+# speeches
+speeches_ns <- xml_find_all( xml_doc, ".//SPEECH" )
+
+# create a function to get the speaker and the receiver together
+get_pairing <- function( node ){
+  speaker_v <- xml_text( xml_find_all( node, "SPEAKER" ) )
+  receiver_v <- xml_text( xml_find_all( node, "RECEIVER" ) )
+  paste( speaker_v, " -> ", receiver_v )
+}
+
+# run the function inside lapply
+pairings_l <- lapply( speeches_ns, get_pairing )
+
+# unlist to get a vector of characters
+pairs_v <- unlist( pairings_l )
+
+# put it together in a nice data frame
+pairings_df <- data.frame( table( pairs_v ) )
+
+# arrange the data by frequency of interaction
+arrange( pairings_df, desc( Freq ) )
+ 
+
+# make the function better by restructuring what data are pulled
+# also add the collapse to the speaker and receiver to combine multiple people
+get_pairing <- function( node ){
+
+    speaker_v <-paste( 
+    xml_text( xml_find_all( node, "SPEAKER" ) ),
+    collapse = "/"
+    )
+
+    receiver_v <- paste(
+    xml_text( xml_find_all( node, "RECEIVER" ) ),
+    collapse = "/"
+    )
+    
+  lines_v <- paste(
+    xml_text( xml_find_all( node, "LINE" ) ),
+    collapse = " "
+  )
+  
+  c( speaker_v, receiver_v, lines_v )
+}
+
+ON PAGE 153 with working through this
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# run over the speeches object
+get_pairing( speeches_ns[[1]] )
 
 
