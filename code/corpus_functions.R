@@ -46,6 +46,50 @@ tokenize <- function( text_v, pattern = "[^A-Za-z0-9']", lower = TRUE ){
   if( lower ){
     text_v <- tolower( text_v )
   }
-  word_v <- unlist( strsplit( text_v, pattern))
+  word_v <- unlist( strsplit( text_v, pattern ) )
   word_v[which( word_v != "" )]
 }
+
+
+# function to extract pairings
+get_pairing <- function( node ){
+  
+  speaker_v <-paste( 
+    xml_text( xml_find_all( node, "SPEAKER" ) ),
+    collapse = "/"
+  )
+  
+  receiver_v <- paste(
+    xml_text( xml_find_all( node, "RECEIVER" ) ),
+    collapse = "/"
+  )
+  
+  lines_v <- paste(
+    xml_text( xml_find_all( node, "LINE" ) ),
+    collapse = " "
+  )
+  
+  c( speaker_v, receiver_v, lines_v )
+}
+
+
+# modified tokenize function
+get_token_count <- function( 
+    text_v, 
+    pattern = "[^A-Za-z0-9']", 
+    lower = TRUE 
+    ){
+  if( lower ){
+    text_v <- tolower( text_v )
+  }
+  word_v <- unlist( strsplit( text_v, pattern ) )
+  word_v[which( word_v != "" )]
+  length( word_v )
+}
+
+
+
+
+
+
+

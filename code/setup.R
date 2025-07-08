@@ -306,10 +306,137 @@ get_pairing <- function( node ){
   c( speaker_v, receiver_v, lines_v )
 }
 
-ON PAGE 153 with working through this
-
 
 # run over the speeches object
 get_pairing( speeches_ns[[1]] )
+
+
+# run from source
+source( "code/corpus_functions.R" )
+
+# run the function
+speech_data_l <- lapply( speeches_ns, get_pairing )
+
+# now build the data frame
+speech_data_df <- data.frame(
+  do.call( rbind, speech_data_l ),
+  stringsAsFactors = FALSE
+)
+
+# set the column names
+colnames( speech_data_df ) <- c( "Speaker", "Receiver", "Speech" )
+
+# see the unique speakers
+speakers_df <- select( speech_data_df, Speaker ) %>% 
+  unique() %>% 
+  arrange( Speaker )
+
+# see the unique receivers
+receivers_df <- select( speech_data_df, Receiver ) %>% 
+  unique() %>% 
+  arrange( Receiver )
+
+# create pairings
+pairings_df <- mutate(
+  speech_data_df,
+  pair = paste( Speaker, Receiver, sep = " -> " )
+  ) %>% 
+  select( pair ) %>% 
+  unique() %>% 
+  arrange( pair )
+
+
+# run modified tokenize function to get counts
+speech_data_counts_df <- rowwise( speech_data_df ) %>% 
+  mutate( word_count = get_token_count( Speech ) )
+
+# now sort it
+sorted_speeches_df <- arrange(
+  speech_data_counts_df,
+  desc( word_count )
+  ) %>% 
+  select( Speaker, Receiver, word_count )
+
+
+# who has the most speeches overall
+group_by( sorted_speeches_df, Speaker ) %>% 
+  summarize( Total = sum( word_count ) ) %>% 
+  arrange( desc( Total ) )
+
+# who is the most common speaker speaking to
+group_by( sorted_speeches_df, Speaker, Receiver ) %>% 
+  filter( Speaker == "HAMLET" ) %>% 
+  summarize( Total = sum( word_count ) ) %>% 
+  arrange( desc( Total ) )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
