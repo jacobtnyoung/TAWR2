@@ -370,15 +370,65 @@ group_by( sorted_speeches_df, Speaker, Receiver ) %>%
   arrange( desc( Total ) )
 
 
+# ----
+# Chapter 14
 
 
+rm( list = ls() )
+setwd( "/Users/jyoung20/GitHub/TAWR2" )
+
+library( syuzhet )
 
 
+# get the raw text
+moby_v  <- get_text_as_string( path_to_file = "data/text/melville.txt" )
+sense_v <- get_text_as_string( path_to_file = "data/text/austen.txt" )
 
 
+# ----
+# Chapter 15
 
+# setup
+rm( list = ls() )
+setwd( "/Users/jyoung20/GitHub/TAWR2" )
+input_dir <- "data/XMLAuthorCorpus"
 
+# use the dir function to make a vector of file names
+files_v <- dir( path = input_dir, pattern = ".*xml" )
 
+# load the xml2 library
+library( xml2 )
+
+# load the functions you need
+source( "code/corpus_functions.R" )
+
+# run the for loop to process each text
+# create the object to add information to
+book_freqs_l <- list()
+
+for( i in seq_along( files_v ) ){
+  
+  # set the xml object to read
+  xml_doc <- read_xml( file.path( input_dir, files_v[i] ) )
+  
+  # create a string of all words in the paragraphs in the document
+  para_text <- get_node_text( xml_doc,
+                              xpath = "/tei:TEI/tei:text/tei:body//tei:p",
+                              ns = c( tei = "http://www.tei-c.org/ns/1.0" ) 
+                              )
+  
+  # tokenize the paragraphs
+  word_v <- tokenize( para_text )
+  
+  # relative frequency of words
+  freq_table <- table( word_v ) / length( word_v )
+  
+  # assign it to the book_freqs_l object
+  book_freqs_l[[files_v[i]]] <- as.data.frame(
+    freq_table, stringsAsFactors = FALSE
+  )
+  
+}
 
 
 

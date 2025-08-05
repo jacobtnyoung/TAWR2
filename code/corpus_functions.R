@@ -88,7 +88,12 @@ get_token_count <- function(
 }
 
 
-
+# function to build a list
+get_node_text <- function( node, xpath, ns){
+  paragraph_nodes <- xml_find_all( node, xpath, ns )
+  paragraph_v <- xml_text( paragraph_nodes )
+  paste( paragraph_v, collapse = " " )
+}
 
 
 
