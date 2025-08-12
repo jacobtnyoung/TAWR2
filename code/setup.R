@@ -430,24 +430,53 @@ for( i in seq_along( files_v ) ){
   
 }
 
+# create a data frame from the list
+freqs_df <- do.call( rbind, book_freqs_l )
+
+# substitute the names
+text_names_v <- gsub(
+  pattern =  "\\.\\d+",
+  replacement = "",
+  x = rownames( freqs_df )
+)
+
+# bind the character
+long_df <- data.frame( text_names_v, freqs_df )
+
+# name the columns
+colnames( long_df ) <- c( "file", "token", "freq" )
+
+# reshape to wide
+wide_t <- xtabs( formula = freq ~ file + token, data = long_df )
+
+# convert to data frame
+wide_df <- as.data.frame.matrix( wide_t )
+
+# look at the mean frequency for tokens
+token_means <- colMeans( wide_df )
+head( token_means )
+
+# filter the names based on a threshold for the word frequency
+keepers_v <- names( token_means[ which( token_means >= 0.01 ) ] )
+
+# calculate the euclidian distance
+dist_m <- dist( wide_df[, keepers_v] )
+
+# convert to a matrix for easy viewing
+simple_dist_m <- as.matrix( dist_m )
+
+# sort by which are closest to the anonymous
+sort( simple_dist_m[, "anonymous.xml"] )
+
+# using a clustering tool
+cluster <- hclust( dist_m )
+cluster$labels <- rownames( wide_df )
+plot( cluster )
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ----
+# Chapter 16
 
 
 
