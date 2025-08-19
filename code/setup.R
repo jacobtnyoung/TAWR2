@@ -478,15 +478,52 @@ plot( cluster )
 # ----
 # Chapter 16
 
+# setup
+rm( list = ls() )
+setwd( "/Users/jyoung20/GitHub/TAWR2" )
+input_dir <- "data/XMLAuthorCorpus"
+library( xml2 )
 
+# use the dir function to make a vector of file names
+files_v <- dir( path = input_dir, pattern = ".*xml" )
 
+# create a split vector
+x <- LETTERS
+groups_v <- cut( 1:length( x ), breaks = 13, labels = FALSE )
+chunks_l <- split( x, groups_v )
 
+# load the functions you need
+source( "code/corpus_functions.R" )
 
+# start building for loop to use
+for( i in seq_along( files_v ) ){
+  
+  # set the xml object to read
+  xml_doc <- read_xml( file.path( input_dir, files_v[i] ) )
+  
+  # create a string of all words in the paragraphs in the document
+  para_text <- get_node_text( xml_doc,
+                              xpath = "/tei:TEI/tei:text/tei:body//tei:p",
+                              ns = c( tei = "http://www.tei-c.org/ns/1.0" ) 
+  )
+  
+  # tokenize the paragraphs
+  word_v <- tokenize( para_text )
+  
+  # new code for chunking
+  groups <- cut( 1:length( word_v ), breaks = 13, labels = FALSE )
+  chunks_l <- split( word_v, groups )
+  
+  # create the tables
+  chunk_table_l <- lapply( chunks_l, table )
+  chunks_frequencies_t_l <- lapply( chunk_table_l, prop.table )
+  chunks_frequencies_df_l <- lapply( chunks_frequencies_t_l, data.frame )
+  
+  # create the segments
+  segments_df <- do.call( rbind, chunks_frequencies_df_l )
+}
 
-
-
-
-
+# i gave up around page 201
 
 
 
